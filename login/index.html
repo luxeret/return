@@ -17,49 +17,5 @@
       Discord로 로그인
     </a>
   </div>
-
-  <div id="profileBox" class="hidden text-center p-6 bg-gray-800 rounded-2xl shadow-lg max-w-md w-full">
-    <img id="avatar" class="w-24 h-24 mx-auto rounded-full mb-4" />
-    <h2 id="username" class="text-xl font-bold"></h2>
-    <p id="id" class="text-gray-400 text-sm"></p>
-  </div>
-
-  <script>
-    async function handleAuth() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      if (!code) {
-        // 로그인 페이지니까 로그인 버튼 보이고 종료
-        return;
-      }
-
-      try {
-        const res = await fetch('https://returns.luxeret.com/api/auth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code }),
-        });
-        const data = await res.json();
-        if (data.error) {
-          alert('로그인 실패: ' + data.error);
-          return;
-        }
-        // 로그인 박스 숨기기, 프로필 박스 보이기
-        document.getElementById('loginBox').classList.add('hidden');
-        document.getElementById('profileBox').classList.remove('hidden');
-
-        const user = data.user;
-        document.getElementById('avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-        document.getElementById('username').innerText = `${user.username}#${user.discriminator}`;
-        document.getElementById('id').innerText = `ID: ${user.id}`;
-
-      } catch (err) {
-        console.error(err);
-        alert('로그인 중 오류가 발생했습니다.');
-      }
-    }
-
-    handleAuth();
-  </script>
 </body>
 </html>

@@ -5,21 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Return Workspace</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/toss/tossface/dist/tossface.css" rel="stylesheet" />
   <style>
+    .tossface {
+      font-family: Tossface;
+      font-size: 1.5rem;
+    }
+    @font-face {
+      font-family: 'Pretendard-Medium';
+      src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Pretendard-Light';
+      src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Light.woff') format('woff');
+      font-weight: 500;
+      font-style: normal;
+    }
     body {
-      font-family: 'Pretendard-Light', sans-serif;
+      font-family: 'Pretendard-Light';
     }
   </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
 
+  <!-- 상단 헤더, 주요 UI 등 그대로 유지 -->
+
   <header
-    class="bg-gray-800 border-b border-gray-700 px-4 py-3 flex justify-between items-center sticky top-0 z-50"
+    class="bg-gray-800 border-b border-gray-700 px-4 sm:px-8 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-50"
   >
-    <div class="text-xl font-bold select-none whitespace-nowrap">
+    <div class="text-xl sm:text-2xl font-bold text-gradient-gray select-none whitespace-nowrap">
       Return Workspace
     </div>
-    <div class="flex items-center gap-3 min-w-0">
+    <div class="flex items-center gap-3 sm:gap-4 min-w-0">
       <img
         id="userPhoto"
         class="w-8 h-8 rounded-full hidden flex-shrink-0"
@@ -28,14 +47,14 @@
       />
       <span
         id="userName"
-        class="text-sm text-gray-300 truncate max-w-[150px]"
+        class="text-sm sm:text-base text-gray-300 truncate max-w-[150px]"
         title="사용자명"
       >
         사용자님
       </span>
       <button
         id="logoutBtn"
-        class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-md text-sm whitespace-nowrap"
+        class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-md text-sm sm:text-base whitespace-nowrap"
         type="button"
       >
         로그아웃
@@ -43,9 +62,9 @@
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto py-8 px-4">
-    <h1 class="text-2xl font-bold mb-8">
-      👋 안녕하세요, <span id="welcomeUser">사용자님</span>
+  <main class="max-w-5xl mx-auto py-8 px-4 sm:px-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-8">
+      <span class="tossface">👋</span> 안녕하세요, <span id="welcomeUser">사용자님</span>
     </h1>
 
     <section class="bg-gray-800 rounded-2xl p-6 shadow border border-gray-700 min-h-[220px] mb-6">
@@ -88,73 +107,74 @@
         등록
       </button>
     </section>
-  </main>
+   </main>
 
   <script>
-    // 로그아웃
+    // 로그아웃 버튼 이벤트
     document.getElementById("logoutBtn").addEventListener("click", () => {
       location.href = "https://returns.luxeret.com/login";
     });
 
-    async function main() {
-      // code 가져오기
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-
+    // OAuth2 code 파싱 및 토큰 교환
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
       if (!code) {
-        alert('로그인 후 접근해 주세요.');
+        alert("코드가 없습니다. 다시 로그인해주세요.");
         location.href = "https://returns.luxeret.com/login";
         return;
       }
 
-      try {
-        // 백엔드에 code 전달해 토큰과 유저정보 받기
-        const authRes = await fetch('https://returns.luxeret.com/api/auth', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({code}),
-        });
-        const authData = await authRes.json();
-        if (authData.error) {
-          alert('인증 실패: ' + authData.error);
+      fetch("https://returns.luxeret.com/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            alert("오류가 발생했습니다. 다시 로그인해 주세요.");
+            location.href = "https://returns.luxeret.com/login";
+            return;
+          }
+
+          const user = data.user;
+          const username = `${user.username}#${user.discriminator}`;
+          document.getElementById("userName").textContent = username;
+          document.getElementById("welcomeUser").textContent = username;
+
+          const avatar = document.getElementById("userPhoto");
+          if (user.avatar) {
+            avatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+            avatar.classList.remove("hidden");
+          }
+
+          // 권한 체크 API 호출
+          fetch(`https://returns.luxeret.com/check_permission?user_id=${user.id}`)
+            .then((res) => res.json())
+            .then((perm) => {
+              if (perm.in_guild && perm.has_role) {
+                ["uuidRegisterBtn", "returnIdRegisterBtn"].forEach((btnId) => {
+                  const btn = document.getElementById(btnId);
+                  if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove("opacity-50", "cursor-not-allowed");
+                  }
+                });
+              } else {
+                alert("서버 멤버이거나 역할이 없습니다. 기능 이용 권한이 없습니다.");
+              }
+            })
+            .catch(() => {
+              alert("권한 확인 중 오류가 발생했습니다.");
+            });
+        })
+        .catch(() => {
+          alert("로그인에 실패했습니다. 다시 시도해주세요.");
           location.href = "https://returns.luxeret.com/login";
-          return;
-        }
-
-        const user = authData.user;
-        const userName = `${user.username}#${user.discriminator}`;
-        document.getElementById('userName').textContent = userName;
-        document.getElementById('welcomeUser').textContent = userName;
-
-        const avatar = document.getElementById('userPhoto');
-        if (user.avatar) {
-          avatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-          avatar.classList.remove('hidden');
-        }
-
-        // 권한 체크 API 호출
-        const permRes = await fetch(`https://returns.luxeret.com/check_permission?user_id=${user.id}`);
-        const permData = await permRes.json();
-
-        if (permData.in_guild && permData.has_role) {
-          // 권한 있으면 버튼 활성화
-          ['uuidRegisterBtn', 'returnIdRegisterBtn'].forEach(id => {
-            const btn = document.getElementById(id);
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-          });
-        } else {
-          alert("서버 멤버이거나 역할이 없습니다. 기능 이용 권한이 없습니다.");
-        }
-
-      } catch (err) {
-        console.error(err);
-        alert("오류가 발생했습니다. 다시 로그인해 주세요.");
-        location.href = "https://returns.luxeret.com/login";
-      }
-    }
-
-    main();
+        });
+    })();
   </script>
+  
 </body>
 </html>
