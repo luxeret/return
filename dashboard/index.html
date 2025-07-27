@@ -110,71 +110,64 @@
    </main>
 
   <script>
-    // 로그아웃 버튼 이벤트
+    // 로그아웃 버튼 클릭시 로그인 페이지로 이동
     document.getElementById("logoutBtn").addEventListener("click", () => {
       location.href = "https://returns.luxeret.com/login";
     });
 
-    // OAuth2 code 파싱 및 토큰 교환
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get("code");
-      if (!code) {
-        alert("코드가 없습니다. 다시 로그인해주세요.");
-        location.href = "https://returns.luxeret.com/login";
-        return;
-      }
+    // URL에서 code 파라미터 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
 
+    if (!code) {
+      alert("인가 코드가 없습니다. 로그인 페이지로 이동합니다.");
+      location.href = "https://returns.luxeret.com/login";
+    } else {
+      // 서버에 code 전달해서 토큰 및 사용자 정보 요청
       fetch("https://returns.luxeret.com/api/auth", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ code: code })
       })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            alert("오류가 발생했습니다. 다시 로그인해 주세요.");
-            location.href = "https://returns.luxeret.com/login";
-            return;
-          }
+      .then(res => {
+        if (!res.ok) throw new Error("로그인에 실패했습니다. 다시 시도해주세요.");
+        return res.json();
+      })
+      .then(data => {
+        const user = data.user;
+        const username = `${user.username}#${user.discriminator}`;
+        document.getElementById("userName").textContent = username;
 
-          const user = data.user;
-          const username = `${user.username}#${user.discriminator}`;
-          document.getElementById("userName").textContent = username;
-          document.getElementById("welcomeUser").textContent = username;
-
+        if (user.avatar) {
           const avatar = document.getElementById("userPhoto");
-          if (user.avatar) {
-            avatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-            avatar.classList.remove("hidden");
-          }
+          avatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+          avatar.classList.remove("hidden");
+        }
 
-          // 권한 체크 API 호출
-          fetch(`https://returns.luxeret.com/check_permission?user_id=${user.id}`)
-            .then((res) => res.json())
-            .then((perm) => {
-              if (perm.in_guild && perm.has_role) {
-                ["uuidRegisterBtn", "returnIdRegisterBtn"].forEach((btnId) => {
-                  const btn = document.getElementById(btnId);
-                  if (btn) {
-                    btn.disabled = false;
-                    btn.classList.remove("opacity-50", "cursor-not-allowed");
-                  }
-                });
-              } else {
-                alert("서버 멤버이거나 역할이 없습니다. 기능 이용 권한이 없습니다.");
-              }
-            })
-            .catch(() => {
-              alert("권한 확인 중 오류가 발생했습니다.");
-            });
-        })
-        .catch(() => {
-          alert("로그인에 실패했습니다. 다시 시도해주세요.");
-          location.href = "https://returns.luxeret.com/login";
-        });
-    })();
+        // 권한 체크 API 호출
+        fetch(`https://returns.luxeret.com/check_permission?user_id=${user.id}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.in_guild && data.has_role) {
+              // 권한 있음 → 필요한 버튼 활성화 등 작업
+              console.log("권한 있음");
+            } else {
+              alert("서버 멤버가 아니거나 역할이 없습니다. 기능 이용 권한이 없습니다.");
+            }
+          })
+          .catch(err => {
+            console.error("권한 체크 실패:", err);
+            alert("권한 확인 중 오류가 발생했습니다.");
+          });
+      })
+      .catch(err => {
+        alert(err.message);
+        location.href = "https://returns.luxeret.com/login";
+      });
+    }
   </script>
-  
+
 </body>
 </html>
