@@ -7,13 +7,14 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex items-center justify-center h-screen bg-gray-900">
-  <div id="loginBox" class="text-center p-6 bg-gray-800 rounded-2xl shadow-lg max-w-md w-full">
+  <div class="text-center p-6 bg-gray-800 rounded-2xl shadow-lg max-w-md w-full">
     <h1 class="text-3xl font-bold mb-6 text-white">리턴워크페이스 로그인</h1>
     <p class="mb-8 text-gray-400">계속하려면 디스코드 계정으로 로그인하세요.</p>
-    <a
-      href="https://discord.com/oauth2/authorize?client_id=1398944762299678822&response_type=code&redirect_uri=https%3A%2F%2Freturns.luxeret.com%2Fdashboard%2F&scope=identify"
+    <a 
+      href="https://discord.com/oauth2/authorize?client_id=1398944762299678822&response_type=token&redirect_uri=https%3A%2F%2Freturns.luxeret.com%2Fdashboard%2F&scope=identify"
       class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200 inline-flex items-center"
     >
+      <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.07.07 0 00-.074.035 13.825 13.825 0 00-.6 1.241 18.648 18.648 0 00-5.59 0 13.417 13.417 0 00-.617-1.24.071.071 0 00-.074-.036c-1.67.285-3.28.817-4.885 1.516a.061.061 0 00-.028.021C1.295 9.04.424 13.58.775 18.057a.082.082 0 00.03.056 19.888 19.888 0 006.008 3.06.07.07 0 00.079-.027c.463-.63.875-1.295 1.226-1.994a.074.074 0 00-.041-.104 13.146 13.146 0 01-1.872-.885.07.07 0 01-.007-.117c.126-.095.253-.192.373-.291a.07.07 0 01.07-.01c3.927 1.797 8.18 1.797 12.061 0a.07.07 0 01.071.009c.12.099.247.197.374.292a.07.07 0 01-.006.117c-.6.343-1.224.64-1.873.885a.074.074 0 00-.04.105c.36.698.773 1.362 1.225 1.993a.07.07 0 00.079.028 19.867 19.867 0 006.009-3.06.082.082 0 00.03-.056c.5-5.177-.838-9.673-3.548-13.667a.061.061 0 00-.028-.02zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.175 1.093 2.157 2.418 0 1.334-.955 2.419-2.157 2.419zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.175 1.093 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg>
       Discord로 로그인
     </a>
   </div>
