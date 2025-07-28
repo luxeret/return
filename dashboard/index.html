@@ -139,11 +139,12 @@
     UUID를 등록하거나 변경할 수 있습니다.
   </p>
   <div class="flex flex-wrap gap-3">
-    <button
-      class="bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-md text-sm sm:text-base"
-    >
-      UUID 등록
-    </button>
+<button
+  id="uuidRegisterBtn"
+  class="bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-md text-sm sm:text-base"
+>
+  UUID 등록
+</button>
   </div>
 </section>
 
@@ -158,17 +159,138 @@
     리턴 시스템의 고유아이디를 관리합니다.
   </p>
   <div class="flex flex-wrap gap-3">
-    <button
-      class="bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-md text-sm sm:text-base"
-    >
-      등록
-    </button>
+<button
+  id="customIdRegisterBtn"
+  class="bg-gray-700 hover:bg-gray-600 text-white px-4 sm:px-5 py-2.5 rounded-md text-sm sm:text-base"
+>
+  등록
+</button>
   </div>
 </section>
 
+<!-- ✅ UUID 등록 모달 -->
+<div id="uuidModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-gray-800 p-6 rounded-xl shadow-xl max-w-md w-full border border-gray-700">
+    <h2 class="text-lg font-bold text-white mb-3">UUID 등록</h2>
+    <p class="text-gray-300 text-sm mb-4">
+      등록하면 고객센터를 통해서만 변경할 수 있어요. 정말 UUID를 등록하시겠어요?
+    </p>
+    <input
+      type="text"
+      id="uuidInput"
+      placeholder="예: 4f8a1c27-9b44-4d17-a0c2-8f1e9d8b1234"
+      class="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    />
+    <div class="flex justify-end gap-3 mt-6">
+      <button id="cancelUuid" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-md">
+        취소
+      </button>
+      <button id="confirmUuid" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md">
+        최종 등록
+      </button>
+    </div>
+  </div>
+</div>
 
-  
-  <script>
+<!-- ✅ 고유아이디 등록 모달 -->
+<div id="customIdModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-gray-800 p-6 rounded-xl shadow-xl max-w-md w-full border border-gray-700">
+    <h2 class="text-lg font-bold text-white mb-3">고유아이디 등록</h2>
+    <p class="text-gray-300 text-sm mb-4">
+      등록하면 고객센터를 통해서만 변경할 수 있어요. 정말 고유아이디를 등록하시겠어요?
+    </p>
+    <input
+      type="text"
+      id="customIdInput"
+      placeholder="예: 4ae02d8e0a8e5d74ff809036c78dd45dc420baf3737a1730fe7c5fb44075d572"
+      class="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    />
+    <div class="flex justify-end gap-3 mt-6">
+      <button id="cancelCustomId" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-md">
+        취소
+      </button>
+      <button id="confirmCustomId" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md">
+        최종 등록
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 모달 요소
+const uuidModal = document.getElementById("uuidModal");
+const customIdModal = document.getElementById("customIdModal");
+
+// 입력값
+const uuidInput = document.getElementById("uuidInput");
+const customIdInput = document.getElementById("customIdInput");
+
+// ✅ UUID 등록 버튼 이벤트
+document.getElementById("uuidRegisterBtn").addEventListener("click", () => {
+  uuidInput.value = "";
+  uuidModal.classList.remove("hidden");
+});
+
+// ✅ 고유아이디 등록 버튼 이벤트
+document.getElementById("customIdRegisterBtn").addEventListener("click", () => {
+  customIdInput.value = "";
+  customIdModal.classList.remove("hidden");
+});
+
+// UUID 모달 취소 / 확인
+document.getElementById("cancelUuid").addEventListener("click", () => {
+  uuidModal.classList.add("hidden");
+});
+document.getElementById("confirmUuid").addEventListener("click", () => {
+  const value = uuidInput.value.trim();
+if (!value) return showAlert("UUID를 입력해주세요.");
+  uuidModal.classList.add("hidden");
+  showAlert(`UUID "${value}"가 등록되었습니다. 변경은 고객센터를 통해 가능합니다.`);
+  // TODO: 서버로 등록 요청 보내기
+});
+
+// 고유아이디 모달 취소 / 확인
+document.getElementById("cancelCustomId").addEventListener("click", () => {
+  customIdModal.classList.add("hidden");
+});
+document.getElementById("confirmCustomId").addEventListener("click", () => {
+  const value = customIdInput.value.trim();
+if (!value) return showAlert("고유아이디를 입력해주세요.");
+  customIdModal.classList.add("hidden");
+  showAlert(`고유아이디 "${value}"가 등록되었습니다. 변경은 고객센터를 통해 가능합니다.`);
+  // TODO: 서버로 등록 요청 보내기
+});
+</script>
+
+<!-- 커스텀 알림 모달 -->
+<div id="alertModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden" style="z-index:9999;">
+  <div class="bg-gray-800 p-5 rounded-lg max-w-xs w-full text-center border border-gray-700 shadow-lg">
+    <p id="alertMessage" class="text-white text-base mb-4"></p>
+    <button id="alertCloseBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md">
+      확인
+    </button>
+  </div>
+</div>
+
+<script>
+  const alertModal = document.getElementById("alertModal");
+const alertMessage = document.getElementById("alertMessage");
+const alertCloseBtn = document.getElementById("alertCloseBtn");
+
+// 함수로 커스텀 알림 띄우기
+function showAlert(msg) {
+  alertMessage.textContent = msg;
+  alertModal.classList.remove("hidden");
+}
+
+// 닫기 버튼 클릭 시 모달 숨기기
+alertCloseBtn.addEventListener("click", () => {
+  alertModal.classList.add("hidden");
+});
+</script>
+
+
+<script>
   // 1. access_token URL에서 추출 후 쿠키로 저장하고 URL 정리
   const hash = window.location.hash;
   if (hash.includes("access_token")) {
@@ -221,7 +343,6 @@
     location.href = "https://returns.luxeret.com/login";
   });
 </script>
-
 <script>
 (function(){var w=window;if(w.ChannelIO){return;}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";s.async=true;var x=document.getElementsByTagName("script")[0];x.parentNode.insertBefore(s,x);}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
 ChannelIO('boot', { "pluginKey": "9825c9e9-131f-40b6-a0f2-0cc6dce71f3c" });
