@@ -35,42 +35,45 @@
   </div>
 
   <script>
-    // 1. URL에서 access_token 추출
-    const hash = window.location.hash;
-    if (hash.includes("access_token")) {
-      const params = new URLSearchParams(hash.substring(1));
-      const token = params.get("access_token");
-      if (token) {
-        // URL 깔끔하게
-        history.replaceState(null, null, window.location.pathname);
+  // 1. URL에서 access_token 추출
+  const hash = window.location.hash;
+  if (hash.includes("access_token")) {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get("access_token");
+    if (token) {
+      // URL 깔끔하게
+      history.replaceState(null, null, window.location.pathname);
 
-        // 2. 유저가 서버에 가입했는지 확인
-        fetch("https://discord.com/api/users/@me/guilds/858300001247690824/member", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        .then(res => {
-          if (!res.ok) throw new Error("not in guild");
-          return res.json();
-        })
-        .then(data => {
-          const roles = data.roles || [];
-          const requiredRole = "1188634595135070369";
+      // 2. 유저가 서버에 가입했는지 확인
+      fetch("https://discord.com/api/users/@me/guilds/858300001247690824/member", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("not in guild");
+        return res.json();
+      })
+      .then(data => {
+        const roles = data.roles || [];
+        const requiredRole = "1188634595135070369";
 
-          if (!roles.includes(requiredRole)) {
-            document.getElementById("errorPopup").classList.remove("hidden");
-          } else {
-            // ✅ 통과: 대시보드로 이동
-            window.location.href = "/dashboard/";
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          document.getElementById("errorPopup").classList.remove("hidden");
-        });
-      }
+        if (!roles.includes(requiredRole)) {
+          // 실패 시 리다이렉트
+          window.location.href = "https://luxeret.com/0000";
+        } else {
+          // 성공 시 대시보드로 이동
+          window.location.href = "/dashboard/";
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        // 에러 시에도 리다이렉트
+        window.location.href = "https://luxeret.com/0000";
+      });
     }
-  </script>
+  }
+</script>
+
 </body>
 </html>
