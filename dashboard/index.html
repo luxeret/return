@@ -291,7 +291,53 @@ alertCloseBtn.addEventListener("click", () => {
 
 
 <script>
+  // 1. access_token URL에서 추출 후 쿠키로 저장하고 URL 정리
+  const hash = window.location.hash;
+  if (hash.includes("access_token")) {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get("access_token");
+    if (token) {
+      document.cookie = `access_token=${token}; max-age=3600; path=/; secure`;
+      history.replaceState(null, null, location.pathname); // URL에서 해시 제거
+    }
+  }
 
+  // 2. 쿠키에서 access_token 불러오기
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  const token = getCookie("access_token");
+
+  if (token) {
+    fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("유효하지 않은 토큰");
+        return res.json();
+      })
+      .then(user => {
+        const username = `${user.username}#${user.discriminator}`;
+        document.getElementById("userName").textContent = username;
+        document.getElementById("welcomeUser").textContent = username;
+        const avatar = document.getElementById("userPhoto");
+        if (user.avatar) {
+          avatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+          avatar.classList.remove("hidden");
+        }
+      })
+      .catch(() => {
+        alert("로그인에 실패했습니다. 다시 로그인해주세요.");
+        location.href = "https://returns.luxeret.com/login";
+      });
+  } else {
+    location.href = "https://returns.luxeret.com/login";
+  }
+
+  // 3. 로그아웃 처리
   document.getElementById("logoutBtn").addEventListener("click", () => {
     document.cookie = "access_token=; max-age=0; path=/";
     location.href = "https://returns.luxeret.com/login";
