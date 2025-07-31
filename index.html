@@ -243,6 +243,54 @@
   </div>
 </section>
 
+<style>
+    /* 유튜버 */
+.youtube-section {
+  background-color: #161418; 
+  padding: 3rem 1rem;
+  isolation: isolate;
+}
+
+.youtube-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.youtube-section .section-title {
+  font-size: 3rem; 
+  font-weight: 700;
+  color: #fcfcfc; 
+  margin-bottom: 2.5rem;
+}
+
+.youtube-section .video-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.youtube-section .video-card {
+  background: #0f0d11;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.youtube-section .video-card iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border: none;
+  border-radius: 0;
+}
+
+@media (min-width: 640px) {
+  .youtube-section .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
 
             
             <section id="faq" class="faq-section bg-gradient-top">
